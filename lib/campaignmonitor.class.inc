@@ -124,7 +124,7 @@ class CampaignMonitor {
     }
 
     if (!$this->libraryPath) {
-      drupal_set_message(t('The Campaign Monitor PHP intergration library was not detected, please see the README for information about installing the library.'), 'error', FALSE);
+      drupal_set_message(t('The Campaign Monitor PHP integration library was not detected, please see the README for information about installing the library.'), 'error', FALSE);
     }
 
     return $this->libraryPath;
