@@ -50,6 +50,7 @@ function campaignmonitor_registration_form_user_register_form_alter(&$form, &$fo
       '#options' => $options,
     );
   }
+  $form['#submit'][] = 'campaignmonitor_registration_form_user_register_submit';
 }
 
 /**

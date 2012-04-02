@@ -97,6 +97,7 @@ function campaignmonitor_user_form() {
     drupal_set_message('There are no available lists to subscribe to at the moment.', 'warning');
   }
 
+  $form['#submit'][] = 'campaignmonitor_user_form_submit';
   return $form;
 }
 
