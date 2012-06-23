@@ -1,13 +1,13 @@
 <?php
 
-/*
+/**
  * @file
  * Implementation of the administration interface for the module.
  */
 
 /**
- * Creates the settings form for campaign monitor. It's located under the
- * general tab.
+ * Creates the Campaign Monitor settings form. This is located under the general
+ * tab.
  *
  * @return array $form
  */
@@ -15,8 +15,8 @@ function campaignmonitor_admin_settings_general() {
   // Get account details.
   $account = variable_get('campaignmonitor_account', array());
 
-  // Test if the library have been installed, if it have not be installed a error
-  // message will be shown.
+  // Test if the library has been installed. If it has not been installed an
+  // error message will be shown.
   $cm = CampaignMonitor::getConnector();
   $library_path = $cm->getLibraryPath();
 
@@ -113,8 +113,7 @@ function campaignmonitor_admin_settings_general() {
 }
 
 /**
- * Implements form validation function to test if the api keys entered are
- * valided.
+ * Form validation handler. Tests if the given API keys are valid.
  */
 function campaignmonitor_admin_settings_general_validate($form, &$form_state) {
   $cm = CampaignMonitor::getConnector($form_state['values']['campaignmonitor_account']['api_key'], $form_state['values']['campaignmonitor_account']['client_id']);
@@ -126,21 +125,18 @@ function campaignmonitor_admin_settings_general_validate($form, &$form_state) {
 }
 
 /**
- * Settings submit form handler, which takes care off rehasing the block table
- * to ensure that blocks are avaliable after campign monitor activation.
- *
- * @param array $form
- * @param array $form_state
+ * Form submit handler. Takes care of rehashing the block table to ensure that
+ * blocks are available after Campaign Monitor activation.
  */
 function campaignmonitor_admin_settings_general_submit($form, &$form_state) {
-  // If archive block have been selected, rehash the block cache.
+  // If archive block has been selected, rehash the block cache.
   if (isset($form_state['values']['campaignmonitor_general']['archive']) && $form_state['values']['campaignmonitor_general']['archive']) {
     _block_rehash();
   }
 }
 
 /**
- * Clear the caches used by campaign monitor.
+ * Clear the caches used by Campaign Monitor.
  */
 function campaignmonitor_clear_cache_submit($form, &$form_state) {
   CampaignMonitor::getConnector($form_state['values']['campaignmonitor_account']['api_key'], $form_state['values']['campaignmonitor_account']['client_id'])->clearCache();
