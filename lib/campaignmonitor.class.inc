@@ -825,10 +825,10 @@ class CampaignMonitor {
   public function subscribe($listId, $email, $name = '', $customFields = array()) {
     if ($obj = $this->createSubscriberObj($listId)) {
       $result = $obj->add(array(
-          'EmailAddress' => $email,
-          'Name' => $name,
-          'CustomFields' => $customFields,
-          'Resubscribe' => TRUE,
+        'EmailAddress' => $email,
+        'Name' => $name,
+        'CustomFields' => $customFields,
+        'Resubscribe' => TRUE,
       ));
       if (!$result->was_successful()) {
         $this->addError(WATCHDOG_ERROR, $result->response->Message, $result->http_status_code);

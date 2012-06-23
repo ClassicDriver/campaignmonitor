@@ -103,7 +103,7 @@ function campaignmonitor_admin_settings_lists() {
  * @return array $form
  */
 function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id) {
-  $form =  array('#tree' => TRUE);
+  $form = array('#tree' => TRUE);
 
   // Get campaign monitor connection.
   $cm = CampaignMonitor::getConnector();
@@ -203,13 +203,12 @@ function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id)
 
   // List custom fields.
   if (!empty($list['CustomFields'])) {
-      $options = array();
-      foreach ($list['CustomFields'] as $key => $field) {
-        // Form API, can't handle keys with [] in all cases.
-        $token_form_key = str_replace(array('[', ']'), '', $key);
-        $options[$token_form_key] = $field['FieldName'];
-      }
-
+    $options = array();
+    foreach ($list['CustomFields'] as $key => $field) {
+      // Form API can't handle keys with [] in all cases.
+      $token_form_key = str_replace(array('[', ']'), '', $key);
+      $options[$token_form_key] = $field['FieldName'];
+    }
 
     $form[$form_key]['CustomFields'] = array(
       '#type' => 'fieldset',
@@ -349,10 +348,7 @@ function campaignmonitor_admin_settings_list_delete($form, &$form_state, $list_i
   $form['list_id'] = array('#type' => 'hidden', '#value' => $list_id);
   $form['#submit'][] = 'campaignmonitor_admin_settings_list_delete_submit';
   $confirm_question = 'Are you sure you want to delete this list ?';
-  return confirm_form($form,
-                    $confirm_question,
-                    'admin/config/services/campaignmonitor/lists', $str,
-                    t('Delete'), t('Cancel'));
+  return confirm_form($form, $confirm_question, 'admin/config/services/campaignmonitor/lists', $str, t('Delete'), t('Cancel'));
 }
 
 /**
