@@ -202,7 +202,7 @@ class CampaignMonitor {
     if ($this->libraryLoad(self::CampaignMonitorSubscribers)) {
       return new CS_REST_Subscribers($listId, $this->api_key);
     }
-    $this->addError(WATCHDOG_ERROR, t('Failed to locate the subscribe library.'));
+    $this->addError(WATCHDOG_ERROR, t('Failed to locate the subscribers library.'));
     return FALSE;
   }
 
@@ -266,7 +266,7 @@ class CampaignMonitor {
     else {
       return array(
         'code' => 1,
-        'message' => t('There dos not seam to been any errors.')
+        'message' => t('There do not seem to be any errors.')
       );
     }
   }
@@ -479,7 +479,7 @@ class CampaignMonitor {
     // Load list details and custom fields (using is_array() since
     // getCustomFields() may return an empty array).
     if (!$this->getListDetails($listId) || !is_array($this->getCustomFields($listId))) {
-      $this->addError(WATCHDOG_ERROR, t('Could not retrive extended information for @listID.', array('@listID' => $listId)));
+      $this->addError(WATCHDOG_ERROR, t('Could not retrieve extended information for @listID.', array('@listID' => $listId)));
       return FALSE;
     }
 
@@ -502,7 +502,7 @@ class CampaignMonitor {
   public function updateList($listId, $options = array()) {
     // Make sure that list is loaded.
     if (!$this->getListDetails($listId)) {
-      $this->addError(WATCHDOG_ERROR, t('Could not retrive update list information for @listID.', array('@listID' => $listId)));
+      $this->addError(WATCHDOG_ERROR, t('Could not retrieve update list information for @listID.', array('@listID' => $listId)));
       return FALSE;
     }
 

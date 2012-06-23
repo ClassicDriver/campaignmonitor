@@ -29,7 +29,7 @@ function campaignmonitor_permission() {
     ),
     'access archive' => array(
       'title' => t('Access newsletter archive'),
-      'description' => t('Access newsletter achives'),
+      'description' => t('Access newsletter achive'),
     ),
     'join newsletter' => array(
       'title' => t('Join newsletters'),
@@ -208,7 +208,7 @@ function campaignmonitor_block_view($delta) {
         $block['content'] = drupal_get_form('campaignmonitor_subscribe_form', $delta);
       }
       else {
-        $block['content'] = t('The Campaing monitor list "@list" is not enabled.', array('@list' => $lists[$delta]['name']));
+        $block['content'] = t('The Campaign monitor list "@list" is not enabled.', array('@list' => $lists[$delta]['name']));
       }
 
       // Add some basic styling of form elements.

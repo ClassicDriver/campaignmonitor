@@ -79,7 +79,7 @@ function campaignmonitor_admin_settings_lists() {
       'header' => $header,
       'rows' => $rows,
       'sticky' => TRUE,
-      'empty' => 'Lists not found or non created yet...',
+      'empty' => t('Lists not found or not yet created...'),
     )
   );
 
@@ -126,7 +126,7 @@ function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id)
   $form[$form_key]['status'] = array(
     '#type' => 'fieldset',
     '#title' => t('Enable list'),
-    '#description' => t('Enable the list to configure it and used it on the site.'),
+    '#description' => t('Enable the list to configure it and use it on the site.'),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
@@ -141,7 +141,7 @@ function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id)
   $form[$form_key]['options'] = array(
     '#type' => 'fieldset',
     '#title' => t('List options'),
-    '#description' => t('Changing the values will result in an updated of the values on the Campaign Monitor homepage.'),
+    '#description' => t('Changing the values will result in an update of the values on the Campaign Monitor homepage.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#states' => array(
@@ -196,7 +196,7 @@ function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id)
   $form[$form_key]['display']['name'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display Name field'),
-    '#description' => t('When subscribing, should the name field be displayed.'),
+    '#description' => t('Whether the Name field should be displayed when subscribing.'),
     '#default_value' => isset($defaults['display']['name']) ? $defaults['display']['name'] : 0,
     '#attributes' => array('class' => array('tokenable', 'tokenable-name')),
   );
@@ -226,7 +226,7 @@ function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id)
 
     $form[$form_key]['CustomFields']['selected'] = array(
       '#type' => 'checkboxes',
-      '#title' => t('Avaliable fields'),
+      '#title' => t('Available fields'),
       '#description' => t('Select the fields that should be displayed on subscription forms.'),
       '#options' => $options,
       '#default_value' => isset($defaults['CustomFields']['selected']) ? $defaults['CustomFields']['selected'] : array(),
@@ -314,7 +314,7 @@ function campaignmonitor_admin_settings_list_edit_validate($form, &$form_state) 
   if (!$cm->updateList($form_state['values']['listId'], $options)) {
     $error = $cm->getLatestError();
     form_set_error('', $error['message']);
-    drupal_set_message(t('The list options was not updated correctly at Campaign Monitor.'), 'error');
+    drupal_set_message(t('The list options were not updated correctly at Campaign Monitor.'), 'error');
     return FALSE;
   }
 
@@ -343,9 +343,7 @@ function campaignmonitor_admin_settings_list_delete($form, &$form_state, $list_i
   // Get Campaign Monitor connection.
   $lists = CampaignMonitor::getConnector()->getLists();
 
-  $str = t('You are about to delete the list "@list", which may still have users
-            subscribed to it.<br /><br />This action cannot be undone.',
-          array('@list' => $lists[$list_id]['name']));
+  $str = t('You are about to delete the list "@list", which may still have users subscribed to it.<br /><br />This action cannot be undone.', array('@list' => $lists[$list_id]['name']));
 
   // Build confirmation form.
   $form['list_id'] = array('#type' => 'hidden', '#value' => $list_id);
