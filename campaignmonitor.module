@@ -143,7 +143,7 @@ function campaignmonitor_theme() {
 }
 
 
-/*
+/**
  * Implements hook_block_info().
  */
 function campaignmonitor_block_info() {
@@ -158,7 +158,7 @@ function campaignmonitor_block_info() {
         // Get local configuration options and check if the list is enabled.
         if (campaignmonitor_is_list_enabled($list_id)) {
           $blocks[$list_id] = array(
-            'info' => t('Subscribe to @list_name', array('@list_name' => $list['name'])),
+            'info' => t('Subscribe to @list_name (Campaign Monitor)', array('@list_name' => $list['name'])),
           );
         }
       }
@@ -421,7 +421,12 @@ function campaignmonitor_subscribe_form_submit($form, &$form_state) {
   }
 
   $lists = $cm->getLists();
-  drupal_set_message(t('You are now subscribed to the "@list" list.', array('@list' => $lists[$list_id]['name'])), 'status');
+  if (isset($lists[$list_id]['details']['ConfirmationSuccessPage']) && !empty($lists[$list_id]['details']['ConfirmationSuccessPage'])) {
+    drupal_goto($lists[$list_id]['details']['ConfirmationSuccessPage']);
+  }
+  else {
+    drupal_set_message(t('You are now subscribed to the "@list" list.', array('@list' => $lists[$list_id]['name'])), 'status');
+  }
 }
 
 /**
