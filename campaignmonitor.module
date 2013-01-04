@@ -420,6 +420,7 @@ function campaignmonitor_subscribe_form_submit($form, &$form_state) {
     return FALSE;
   }
 
+  // Check if the user should be sent to a subscribe page.
   $lists = $cm->getLists();
   if (isset($lists[$list_id]['details']['ConfirmationSuccessPage']) && !empty($lists[$list_id]['details']['ConfirmationSuccessPage'])) {
     drupal_goto($lists[$list_id]['details']['ConfirmationSuccessPage']);

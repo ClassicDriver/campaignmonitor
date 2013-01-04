@@ -123,7 +123,14 @@ function campaignmonitor_user_form_submit($form, &$form_state) {
           $form_state['redirect'] = FALSE;
           return FALSE;
         }
-        drupal_set_message(t('You are now subscribed to the "@list" list.', array('@list' => $lists_info[$list_id]['name'])), 'status');
+
+        // Check if the user should be sent to a subscribe page.
+        if (isset($lists_info[$list_id]['details']['ConfirmationSuccessPage']) && !empty($lists_info[$list_id]['details']['ConfirmationSuccessPage'])) {
+          drupal_goto($lists_info[$list_id]['details']['ConfirmationSuccessPage']);
+        }
+        else {
+          drupal_set_message(t('You are now subscribed to the "@list" list.', array('@list' => $lists_info[$list_id]['name'])), 'status');
+        }
       }
     }
     else {
@@ -134,7 +141,14 @@ function campaignmonitor_user_form_submit($form, &$form_state) {
           $form_state['redirect'] = FALSE;
           return FALSE;
         }
-        drupal_set_message(t('You are now removed from the "@list" list.', array('@list' => $lists_info[$list_id]['name'])), 'status');
+
+        // Check if the user should be sent to an unsubscribe page.
+        if (isset($lists_info[$list_id]['details']['UnsubscribePage']) && !empty($lists_info[$list_id]['details']['UnsubscribePage'])) {
+          drupal_goto($lists_info[$list_id]['details']['UnsubscribePage']);
+        }
+        else {
+          drupal_set_message(t('You are now removed from the "@list" list.', array('@list' => $lists_info[$list_id]['name'])), 'status');
+        }
       }
     }
   }
