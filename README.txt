@@ -30,8 +30,8 @@ Installation
 - Create a folder in your modules directory called campaignmonitor and put the
   module's files in this directory.
 
-- Go into sites/all/libraries/ folder and download or clone the createsend-php
-  API from github.com. It can be download from
+- Create a folder in your sites/all/libraries directory called campaignmonitor and put the
+  contents of createsend-php API files from github.com in this directory. It can be download from
   http://github.com/campaignmonitor/createsend-php or use the command below.
 
   ~$ git clone https://github.com/campaignmonitor/createsend-php.git campaignmonitor
