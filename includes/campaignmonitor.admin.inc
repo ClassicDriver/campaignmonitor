@@ -130,7 +130,9 @@ function campaignmonitor_admin_settings_general_validate($form, &$form_state) {
  */
 function campaignmonitor_admin_settings_general_submit($form, &$form_state) {
   // If archive block has been selected, rehash the block cache.
-  if (isset($form_state['values']['campaignmonitor_general']['archive']) && $form_state['values']['campaignmonitor_general']['archive']) {
+  if ((isset($form_state['values']['campaignmonitor_general']['archive']) && $form_state['values']['campaignmonitor_general']['archive']) ||
+      $form['campaignmonitor_account']['api_key']['#default_value'] != $form_state['values']['campaignmonitor_account']['api_key'] ||
+      $form['campaignmonitor_account']['client_id']['#default_value'] != $form_state['values']['campaignmonitor_account']['client_id']) {
     _block_rehash();
   }
 }
@@ -141,4 +143,7 @@ function campaignmonitor_admin_settings_general_submit($form, &$form_state) {
 function campaignmonitor_clear_cache_submit($form, &$form_state) {
   CampaignMonitor::getConnector($form_state['values']['campaignmonitor_account']['api_key'], $form_state['values']['campaignmonitor_account']['client_id'])->clearCache();
   drupal_set_message(t('Campaign Monitor cache cleared.'), 'status');
+
+  // Rehash blocks, thereby rebuilding the DB block cache.
+  _block_rehash();
 }
