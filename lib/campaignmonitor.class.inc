@@ -738,7 +738,19 @@ class CampaignMonitor {
               // Convert the custom fields object into a keyed array.
               $this->subscribers[$listId . $email][$key] = array();
               foreach ($value as $field) {
-                $this->subscribers[$listId . $email][$key][$field->Key] = $field->Value;
+                // Check if the field has been set. If not, set the value.
+                if (!isset($this->subscribers[$listId . $email][$key][$field->Key])){
+                  $this->subscribers[$listId . $email][$key][$field->Key] = $field->Value;
+                }
+                // If the field HAS been set, and there are additional values, check if the field is NOT an array?
+                else if (!is_array($this->subscribers[$listId . $email][$key][$field->Key])) {
+                  // If the field is not an array, assign an array to the field, containing the previous value of the field and this new value.
+                  $this->subscribers[$listId . $email][$key][$field->Key] = array($this->subscribers[$listId . $email][$key][$field->Key], $field->Value);
+                }
+                // If the field is an array and there is an additional value, append it to the field rather than overwriting the field value.
+                else {
+                  $this->subscribers[$listId . $email][$key][$field->Key][] = $field->Value;
+                }
               }
             }
             else {
