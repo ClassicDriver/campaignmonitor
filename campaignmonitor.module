@@ -361,6 +361,23 @@ function campaignmonitor_subscribe_form($form, &$form_state, $list_id) {
           '#default_value' => isset($subscriber['CustomFields'][$field['FieldName']]) ? $subscriber['CustomFields'][$field['FieldName']] : $token,
         );
         break;
+
+      case 'Date':
+        // Load jQuery datepicker to ensure the right date format.
+        drupal_add_library('system','ui.datepicker');
+        $form['CustomFields'][$form_key] = array(
+          '#type' => 'textfield',
+          '#title' => check_plain($field['FieldName']),
+          '#default_value' => isset($subscriber['CustomFields'][$field['FieldName']]) ? $subscriber['CustomFields'][$field['FieldName']] : $token,
+          '#attributes' => array('class' => array('campaignmonitor-date')),
+          '#attached' => array(
+            'js' => array(
+              'type' => 'file',
+              'data' => drupal_get_path('module', 'campaignmonitor') . '/js/campaignmonitor.js',
+            ),
+          ),
+        );
+        break;
     }
   }
 
