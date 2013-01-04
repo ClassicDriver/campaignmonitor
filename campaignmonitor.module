@@ -366,7 +366,7 @@ function campaignmonitor_subscribe_form($form, &$form_state, $list_id) {
 
   $form['list_id'] = array(
     '#type' => 'hidden',
-    '#value' => $list_id,
+    '#default_value' => $list_id,
   );
 
   $form['submit'] = array(
