@@ -60,7 +60,6 @@ class CampaignMonitor {
    * @param string $libraryPath optional
    */
   private function __construct($api_key = FALSE, $client_id = FALSE) {
-
     // Get account information.
     $account = variable_get('campaignmonitor_account', array());
 
@@ -329,6 +328,7 @@ class CampaignMonitor {
             foreach ($result->response as $list) {
               $this->lists[$list->ListID] = array(
                 'name' => $list->Name,
+                'weight' => variable_get('campaignmonitor_list_' . $list->ListID . '_weight', '0'),
               );
             }
             cache_set('campaignmonitor_lists', $this->lists, 'cache');
@@ -342,8 +342,14 @@ class CampaignMonitor {
         }
       }
     }
-
+    uasort($this->lists, 'CampaignMonitor::_sort');
     return $this->lists;
+  }
+
+  public static function _sort($a, $b) {
+    $a = (array) $a + array('weight' => 0, 'name' => '');
+    $b = (array) $b + array('weight' => 0, 'name' => '');
+    return $a['weight'] < $b['weight'] ? -1 : ($a['weight'] > $b['weight'] ? 1 : ($a['name'] < $b['name'] ? -1 : 1));
   }
 
   /**
@@ -732,29 +738,39 @@ class CampaignMonitor {
       if ($obj = $this->createSubscriberObj($listId)) {
         $this->subscribers[$listId . $email] = array();
         $result = $obj->get($email);
-        if ($result->was_successful()) {
-          foreach ($result->response as $key => $value) {
-            if ($key == 'CustomFields') {
-              // Convert the custom fields object into a keyed array.
-              $this->subscribers[$listId . $email][$key] = array();
-              foreach ($value as $field) {
-                // Check if the field has been set. If not, set the value.
-                if (!isset($this->subscribers[$listId . $email][$key][$field->Key])){
-                  $this->subscribers[$listId . $email][$key][$field->Key] = $field->Value;
-                }
-                // If the field HAS been set, and there are additional values, check if the field is NOT an array?
-                else if (!is_array($this->subscribers[$listId . $email][$key][$field->Key])) {
-                  // If the field is not an array, assign an array to the field, containing the previous value of the field and this new value.
-                  $this->subscribers[$listId . $email][$key][$field->Key] = array($this->subscribers[$listId . $email][$key][$field->Key], $field->Value);
-                }
-                // If the field is an array and there is an additional value, append it to the field rather than overwriting the field value.
-                else {
-                  $this->subscribers[$listId . $email][$key][$field->Key][] = $field->Value;
+        // Continue also if the subscriber was not found, so that the empty
+        // array will be stored in cache. By doing this, the service will not
+        // be called on every request if the user is not yet in the cache.
+        if ($result->was_successful() || $result->http_status_code == 400) {
+          if ($result->http_status_code != 400) {
+            foreach ($result->response as $key => $value) {
+              if ($key == 'CustomFields') {
+                // Convert the custom fields object into a keyed array.
+                $this->subscribers[$listId . $email][$key] = array();
+                foreach ($value as $field) {
+                  // Check if the field has been set. If not, set the value.
+                  if (!isset($this->subscribers[$listId . $email][$key][$field->Key])){
+                    $this->subscribers[$listId . $email][$key][$field->Key] = $field->Value;
+                  }
+                  // If the field HAS been set, and there are additional values, check if the field is NOT an array?
+                  else if (!is_array($this->subscribers[$listId . $email][$key][$field->Key])) {
+                    // If the field is not an array, assign an array to the field, containing the previous value of the field and this new value.
+                    $this->subscribers[$listId . $email][$key][$field->Key] = array($this->subscribers[$listId . $email][$key][$field->Key], $field->Value);
+                  }
+                  // If the field is an array and there is an additional value, append it to the field rather than overwriting the field value.
+                  else {
+                    $this->subscribers[$listId . $email][$key][$field->Key][] = $field->Value;
+                  }
                 }
               }
-            }
-            else {
-              $this->subscribers[$listId . $email][$key] = $value;
+              else {
+                // Remove the subscriber from the requests cache if it is now
+                // active.
+                if ($key == 'State' && $value == 'Active') {
+                  $this->removeFromSubscribersRequestsCache($listId, $email);
+                }
+                $this->subscribers[$listId . $email][$key] = $value;
+              }
             }
           }
           // Save the subscriber information in the cache.
@@ -787,12 +803,18 @@ class CampaignMonitor {
    */
   public function isSubscribed($listId, $email) {
     $result = $this->getSubscriber($listId, $email);
+    $return = FALSE;
     if (!empty($result)) {
       if ($result['State'] == 'Active') {
-        return TRUE;
+        $return = TRUE;
       }
     }
-    return FALSE;
+    // If the return is false, check also the requests cache, the user may be
+    // there.
+    if (!$return) {
+      $return = $this->hasSubscriberRequest($listId, $email);
+    }
+    return $return;
   }
 
   /**
@@ -818,6 +840,45 @@ class CampaignMonitor {
   }
 
   /**
+   * Adds a subscriber to a separate cache, that stores all the requests that
+   * have been made and not yet confirmed from the Campaign Monitor side.
+   *
+   * @param sting $listId
+   *   The unique Campaign Monitor list ID.
+   * @param type $email
+   *   The e-mail address to be added to the cache.
+   */
+  public function addToSubscribersRequestsCache($listId, $email) {
+    $cache = cache_get('campaignmonitor_subscribers_requests');
+    if (!$cache->data) {
+      $cache->data = array();
+    }
+    $cache->data[$listId . $email] = TRUE;
+    cache_set('campaignmonitor_subscribers_requests', $cache->data, 'cache');
+  }
+
+  /**
+   * Removes a subscriver from the requests cache.
+   *
+   * @see addToSubscribersRequestsCache().
+   */
+  public function removeFromSubscribersRequestsCache($listId, $email) {
+    $cache = cache_get('campaignmonitor_subscribers_requests');
+    if ($cache && !empty($cache->data)) {
+      unset($cache->data[$listId . $email]);
+      cache_set('campaignmonitor_subscribers_requests', $cache->data, 'cache');
+    }
+  }
+
+  public function hasSubscriberRequest($listId, $email) {
+    $cache = cache_get('campaignmonitor_subscribers_requests');
+    if ($cache && !empty($cache->data) && $cache->data[$listId . $email]) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * Subscribe a user to a given list, with information entered. If the user is
    * already subscribed to the list, her/his information will be updated with
    * the new values.
@@ -835,6 +896,12 @@ class CampaignMonitor {
    *   TRUE on success, FALSE otherwise.
    */
   public function subscribe($listId, $email, $name = '', $customFields = array()) {
+    $lists = $this->getLists();
+    $account = user_load_by_mail($email);
+    // Make sure we have an user, even it is anonymous.
+    if (!$account) {
+      $account = drupal_anonymous_user();
+    }
     if ($obj = $this->createSubscriberObj($listId)) {
       $result = $obj->add(array(
         'EmailAddress' => $email,
@@ -844,11 +911,17 @@ class CampaignMonitor {
       ));
       if (!$result->was_successful()) {
         $this->addError(WATCHDOG_ERROR, $result->response->Message, $result->http_status_code);
+        module_invoke('rules', 'invoke_event', 'newsletter_subscribe_fail', $account, $lists[$listId]);
         return FALSE;
       }
       $this->removeSubscriberFromCache($listId, $email);
+      // Add the subscriber to our cache, until the status from the campaign
+      // monitor side is confirmed.
+      $this->addToSubscribersRequestsCache($listId, $email);
+      module_invoke('rules', 'invoke_event', 'newsletter_subscribe', $account, $lists[$listId]);
       return TRUE;
     }
+    module_invoke('rules', 'invoke_event', 'newsletter_subscribe_fail', $account, $lists[$listId]);
     return FALSE;
   }
 
@@ -864,15 +937,29 @@ class CampaignMonitor {
    *   TRUE on success, FALSE otherwise.
    */
   public function unsubscribe($listId, $email) {
+    $lists = $this->getLists();
+    $account = user_load_by_mail($email);
+    // Make sure we have an user, even it is anonymous.
+    if (!$account) {
+      $account = drupal_anonymous_user();
+    }
     if ($obj = $this->createSubscriberObj($listId)) {
       $result = $obj->unsubscribe($email);
       if (!$result->was_successful()) {
         $this->addError(WATCHDOG_ERROR, $result->response->Message, $result->http_status_code);
-        return FALSE;
+        // For the 400 code, just continue, it means that the user is already
+        // not there.
+        if ($result->http_status_code != 400) {
+          module_invoke('rules', 'invoke_event', 'newsletter_unsubscribe_fail', $account, $lists[$listId]);
+          return FALSE;
+        }
       }
       $this->removeSubscriberFromCache($listId, $email);
+      $this->removeFromSubscribersRequestsCache($listId, $email);
+      module_invoke('rules', 'invoke_event', 'newsletter_unsubscribe', $account, $lists[$listId]);
       return TRUE;
     }
+    module_invoke('rules', 'invoke_event', 'newsletter_unsubscribe_fail', $account, $lists[$listId]);
     return FALSE;
   }
 
