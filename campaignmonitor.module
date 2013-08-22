@@ -205,7 +205,7 @@ function campaignmonitor_block_view($delta) {
     if ($lists) {
       $block['subject'] = t($lists[$delta]['name']);
       if (campaignmonitor_is_list_enabled($delta)) {
-        $block['content'] = drupal_get_form('campaignmonitor_subscribe_form', $delta);
+        $block['content'] = drupal_get_form('campaignmonitor_subscribe_form_' . $delta, $delta);
       }
       else {
         $block['content'] = t('The Campaign monitor list "@list" is not enabled.', array('@list' => $lists[$delta]['name']));
@@ -220,6 +220,20 @@ function campaignmonitor_block_view($delta) {
   }
 
   return $block;
+}
+
+/**
+ * Implements hook_forms().
+ *
+ * Allows the campaignmonitor form to be repeated multiple times on a page.
+ * See http://drupal.org/node/1970846.
+ */
+function campaignmonitor_forms($form_id, $args) {
+  $forms = array();
+  if (substr($form_id, 0, 31) == 'campaignmonitor_subscribe_form_') {
+    $forms[$form_id] = array('callback' => 'campaignmonitor_subscribe_form');
+  }
+  return $forms;
 }
 
 /**
@@ -399,6 +413,7 @@ function campaignmonitor_subscribe_form($form, &$form_state, $list_id) {
  * if the API call fails.
  */
 function campaignmonitor_subscribe_form_submit($form, &$form_state) {
+
   // Get a Campaign Monitor object.
   $cm = CampaignMonitor::getConnector();
 
