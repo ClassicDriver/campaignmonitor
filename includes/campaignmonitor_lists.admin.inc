@@ -39,22 +39,21 @@ function campaignmonitor_admin_settings_lists() {
     foreach ($lists as $id => $list) {
       // Define supported operations.
       $operations = array(
-        'Edit' => l(t('Edit'), 'admin/config/services/campaignmonitor/lists/' . $id . '/edit'),
-        'Delete' => l(t('Delete'), 'admin/config/services/campaignmonitor/lists/' . $id . '/delete')
+        'Edit' => l(t('Edit'), 'admin/config/services/campaignmonitor/lists/' . $id . '/edit', array('query' => array('token' => drupal_get_token()))),
+        'Delete' => l(t('Delete'), 'admin/config/services/campaignmonitor/lists/' . $id . '/delete', array('query' => array('token' => drupal_get_token()))),
       );
 
       // Load local list options.
       $list_options = variable_get('campaignmonitor_list_' . $id, array());
-      $class = 'campaignmonitor-list-enabled';
       if (isset($list_options['status']['enabled']) && !$list_options['status']['enabled']) {
         // Add enable operation.
         $class = 'campaignmonitor-list-disabled';
-        $operations['enable'] = l(t('Enable'), 'admin/config/services/campaignmonitor/lists/' . $id . '/enable');
+        $operations['enable'] = l(t('Enable'), 'admin/config/services/campaignmonitor/lists/' . $id . '/enable', array('query' => array('token' => drupal_get_token())));
       }
       else {
         // Add disable operation.
         $class = 'campaignmonitor-list-enabled';
-        $operations['disable'] = l(t('Disable'), 'admin/config/services/campaignmonitor/lists/' . $id . '/disable');
+        $operations['disable'] = l(t('Disable'), 'admin/config/services/campaignmonitor/lists/' . $id . '/disable', array('query' => array('token' => drupal_get_token())));
       }
 
       // Allow other modules to add more operations.
@@ -103,6 +102,10 @@ function campaignmonitor_admin_settings_lists() {
  * @return array $form
  */
 function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id) {
+
+  // Confirm that this form has a valid security token present.
+  _campaignmonitor_admin_verify_access();
+
   $form = array('#tree' => TRUE);
 
   // Get campaign monitor connection.
@@ -339,6 +342,10 @@ function campaignmonitor_admin_settings_list_edit_validate($form, &$form_state) 
  *   The confirmation form.
  */
 function campaignmonitor_admin_settings_list_delete($form, &$form_state, $list_id) {
+
+  // Confirm that this form has a valid security token present.
+  _campaignmonitor_admin_verify_access();
+
   // Get Campaign Monitor connection.
   $lists = CampaignMonitor::getConnector()->getLists();
 
@@ -459,6 +466,10 @@ function campaignmonitor_admin_settings_list_create_form_submit($form, &$form_st
  *   The Campaign Monitor list ID.
  */
 function campaignmonitor_admin_settings_list_enable($list_id) {
+
+  // Confirm that this form has a valid security token present.
+  _campaignmonitor_admin_verify_access();
+
   // Toggle list enable status.
   campaignmonitor_admin_settings_list_toggle_enable($list_id);
 
@@ -475,6 +486,10 @@ function campaignmonitor_admin_settings_list_enable($list_id) {
  *   The Campaign Monitor list ID.
  */
 function campaignmonitor_admin_settings_list_disable($list_id) {
+
+  // Confirm that this form has a valid security token present.
+  _campaignmonitor_admin_verify_access();
+
   // Toggle list enable status.
   campaignmonitor_admin_settings_list_toggle_enable($list_id);
 
@@ -502,4 +517,16 @@ function campaignmonitor_admin_settings_list_toggle_enable($list_id) {
 
   // Clear blocks cache.
   _block_rehash();
+}
+
+/**
+ * Verify that a token is set for CSRF protection.
+ */
+function _campaignmonitor_admin_verify_access() {
+
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'])) {
+    drupal_not_found();
+    module_invoke_all('exit');
+    exit();
+  }
 }
