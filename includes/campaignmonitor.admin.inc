@@ -23,7 +23,7 @@ function campaignmonitor_admin_settings_general() {
   $form['campaignmonitor_account'] = array(
     '#type' => 'fieldset',
     '#title' => t('Account details'),
-    '#description' => t('Enter your Campaign Monitor account information. See !link for more information.', array('!link' => l(t('the Campaign Monitor API documentation'), 'http://www.campaignmonitor.com/api/required/'))),
+    '#description' => t('Enter your Campaign Monitor account information. See !link for more information.', array('!link' => l(t('the Campaign Monitor API documentation'), 'https://www.campaignmonitor.com/api/getting-started/'))),
     '#collapsible' => empty($account) ? FALSE : TRUE,
     '#collapsed' => empty($account) ? FALSE : TRUE,
     '#tree' => TRUE,
@@ -32,7 +32,7 @@ function campaignmonitor_admin_settings_general() {
   $form['campaignmonitor_account']['api_key'] = array(
     '#type' => 'textfield',
     '#title' => t('API Key'),
-    '#description' => t('Your Campaign Monitor API Key. See <a href="http://www.campaignmonitor.com/api/required/">documentation</a>.'),
+    '#description' => t('Your Campaign Monitor API Key. See <a href="https://www.campaignmonitor.com/api/getting-started/#authenticating_with_an_api_key">documentation</a>.'),
     '#default_value' => isset($account['api_key']) ? $account['api_key'] : '',
     '#required' => TRUE,
   );
@@ -40,7 +40,7 @@ function campaignmonitor_admin_settings_general() {
   $form['campaignmonitor_account']['client_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Client ID'),
-    '#description' => t('Your Campaign Monitor Client ID. See <a href="http://www.campaignmonitor.com/api/required/">documentation</a>.'),
+    '#description' => t('Your Campaign Monitor Client ID. See <a href="https://www.campaignmonitor.com/api/getting-started/#clientid">documentation</a>.'),
     '#default_value' => isset($account['client_id']) ? $account['client_id'] : '',
     '#required' => TRUE,
   );
