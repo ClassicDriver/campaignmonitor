@@ -50,8 +50,6 @@ function campaignmonitor_user_access($account) {
 
 /**
  * Builds the selection list for the user profile page.
- *
- * @return array $form
  */
 function campaignmonitor_user_form() {
   global $user;
@@ -83,7 +81,7 @@ function campaignmonitor_user_form() {
     $form['lists'] = array(
       '#type' => 'checkboxes',
       '#title' => t('News lists'),
-      '#description' => !empty($defaults['instructions']) ? t($defaults['instructions']) : t('Select the news lists that you want to subscribe to.'),
+      '#description' => !empty($defaults['instructions']) ? t('%instructions', array('%instructions' => $defaults['instructions'])) : t('Select the news lists that you want to subscribe to.'),
       '#options' => $options,
       '#default_value' => $default,
     );
@@ -102,7 +100,9 @@ function campaignmonitor_user_form() {
 }
 
 /**
- * Submission form handler. The information about the selected list will be
+ * Submission form handler.
+ *
+ * The information about the selected list will be
  * submitted to Campaign Monitor.
  */
 function campaignmonitor_user_form_submit($form, &$form_state) {
@@ -154,6 +154,9 @@ function campaignmonitor_user_form_submit($form, &$form_state) {
   }
 }
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
 function campaignmonitor_user_form_campaignmonitor_admin_settings_list_edit_alter(&$form, &$form_state, $form_id) {
   // Find form key to index the form array and load defaults.
   $form_key = 'campaignmonitor_list_' . $form['listId']['#value'];
@@ -202,7 +205,6 @@ function campaignmonitor_user_update(&$edit, $account, $category) {
     if (isset($settings['synchronize']) && $settings['synchronize']) {
       $cm = CampaignMonitor::getConnector();
       $lists_info = $cm->getLists();
-      $lists_to_update = array();
       foreach ($lists_info as $list_id => $list) {
         // Check if the list is selected to be shown.
         $list_options = variable_get('campaignmonitor_list_' . $list_id, array());

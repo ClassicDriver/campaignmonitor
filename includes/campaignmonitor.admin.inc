@@ -6,10 +6,10 @@
  */
 
 /**
- * Creates the Campaign Monitor settings form. This is located under the general
- * tab.
+ * Creates the Campaign Monitor settings form.
  *
- * @return array $form
+ * @return array
+ *   A Form API array
  */
 function campaignmonitor_admin_settings_general() {
   // Get account details.
@@ -125,7 +125,9 @@ function campaignmonitor_admin_settings_general_validate($form, &$form_state) {
 }
 
 /**
- * Form submit handler. Takes care of rehashing the block table to ensure that
+ * Form submit handler.
+ *
+ * Takes care of rehashing the block table to ensure that
  * blocks are available after Campaign Monitor activation.
  */
 function campaignmonitor_admin_settings_general_submit($form, &$form_state) {

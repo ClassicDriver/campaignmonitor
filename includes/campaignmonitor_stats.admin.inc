@@ -9,7 +9,7 @@
  * Generates the statistics overview.
  *
  * @return string
- * The rendered HTML.
+ *   The rendered HTML.
  */
 function campaignmonitor_admin_settings_stats() {
   $account = variable_get('campaignmonitor_account', FALSE);

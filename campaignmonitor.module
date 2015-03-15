@@ -187,7 +187,7 @@ function campaignmonitor_block_view($delta) {
     if ($campaigns) {
       $content = '<ul>';
       foreach ($campaigns as $campaign) {
-        $content .= '<li>' . l($campaign['Name'], $campaign['Link'] ) . ' ' . format_date($campaign['Sent'], 'short') . '</li>';
+        $content .= '<li>' . l($campaign['Name'], $campaign['Link']) . ' ' . format_date($campaign['Sent'], 'short') . '</li>';
       }
       $content .= '</ul>';
 
@@ -203,7 +203,7 @@ function campaignmonitor_block_view($delta) {
     // Get lists form Campaign Monitor.
     $lists = CampaignMonitor::getConnector()->getLists();
     if ($lists) {
-      $block['subject'] = t($lists[$delta]['name']);
+      $block['subject'] = t('%name', array('%name' => $lists[$delta]['name']));
       if (campaignmonitor_is_list_enabled($delta)) {
         $block['content'] = drupal_get_form('campaignmonitor_subscribe_form', $delta);
       }
@@ -255,7 +255,7 @@ function campaignmonitor_subscribe_form($form, &$form_state, $list_id) {
   if (isset($list_options['display']['name']) && $list_options['display']['name']) {
     // Token replace if the token module is present.
     if (isset($list_options['tokens']['name']) && module_exists('token') && $user->uid != 0) {
-      $name = token_replace($list_options['tokens']['name'], array(), array('clear'=> TRUE));
+      $name = token_replace($list_options['tokens']['name'], array(), array('clear' => TRUE));
     }
 
     // Check if the user is subscribed and get name from Campaign Monitor.
@@ -330,7 +330,7 @@ function campaignmonitor_subscribe_form($form, &$form_state, $list_id) {
 
         // If one value was selected, default is a string else an array.
         $cm_default = isset($subscriber['CustomFields'][$field['FieldName']]) ? $subscriber['CustomFields'][$field['FieldName']] : array();
-        $is_array = is_array($cm_default); // Exspensive.
+        $is_array = is_array($cm_default);
         $default = array();
         foreach ($options as $value) {
           if ($is_array) {
@@ -364,7 +364,7 @@ function campaignmonitor_subscribe_form($form, &$form_state, $list_id) {
 
       case 'Date':
         // Load jQuery datepicker to ensure the right date format.
-        drupal_add_library('system','ui.datepicker');
+        drupal_add_library('system', 'ui.datepicker');
         $form['CustomFields'][$form_key] = array(
           '#type' => 'textfield',
           '#title' => check_plain($field['FieldName']),
@@ -395,8 +395,7 @@ function campaignmonitor_subscribe_form($form, &$form_state, $list_id) {
 }
 
 /**
- * Subscribe form submit handler, which calls the API. It may return form errors
- * if the API call fails.
+ * Subscribe form submit handler.
  */
 function campaignmonitor_subscribe_form_submit($form, &$form_state) {
   // Get a Campaign Monitor object.
@@ -412,7 +411,7 @@ function campaignmonitor_subscribe_form_submit($form, &$form_state) {
         foreach ($field as $value) {
           $custom_fields[] = array(
             'Key' => check_plain($key),
-            'Value' => check_plain($value)
+            'Value' => check_plain($value),
           );
         }
       }
@@ -420,7 +419,7 @@ function campaignmonitor_subscribe_form_submit($form, &$form_state) {
         // Add non-array custom fields.
         $custom_fields[] = array(
           'Key' => check_plain($key),
-          'Value' => check_plain($field)
+          'Value' => check_plain($field),
         );
       }
     }
@@ -448,8 +447,9 @@ function campaignmonitor_subscribe_form_submit($form, &$form_state) {
 }
 
 /**
- * Checks if the list given by id is enabled locally. If the list id enabled 1
- * is returned else 0.
+ * Checks if the list given by id is enabled locally.
+ *
+ * If the list id enabled 1 is returned else 0.
  *
  * @param string $list_id
  *   The Campaign Monitor list ID.

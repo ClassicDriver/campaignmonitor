@@ -19,6 +19,8 @@ function campaignmonitor_registration_permission() {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ *
  * Hooks into the registration form and adds the option to select one of the
  * available Campaign Monitor lists on registration.
  */
@@ -46,7 +48,7 @@ function campaignmonitor_registration_form_user_register_form_alter(&$form, &$fo
     $defaults = variable_get('campaignmonitor_general', array());
     $form['campaignmonitor']['campaignmonitor_lists'] = array(
       '#type' => 'checkboxes',
-      '#description' => !empty($defaults['instructions']) ? t($defaults['instructions']) : t('Select the news lists that you want to subscribe to.'),
+      '#description' => !empty($defaults['instructions']) ? t('%instructions', array('%instructions' => $defaults['instructions'])) : t('Select the news lists that you want to subscribe to.'),
       '#options' => $options,
     );
   }
@@ -54,7 +56,9 @@ function campaignmonitor_registration_form_user_register_form_alter(&$form, &$fo
 }
 
 /**
- * Submission form handler. Information about the selected list will be
+ * Submission form handler.
+ *
+ * Information about the selected list will be
  * submitted to Campaign Monitor.
  */
 function campaignmonitor_registration_form_user_register_submit($form, &$form_state) {
@@ -82,6 +86,9 @@ function campaignmonitor_registration_form_user_register_submit($form, &$form_st
   }
 }
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
 function campaignmonitor_registration_form_campaignmonitor_admin_settings_list_edit_alter(&$form, &$form_state, $form_id) {
   // Find form key to index the form array and load defaults.
   $form_key = 'campaignmonitor_list_' . $form['listId']['#value'];

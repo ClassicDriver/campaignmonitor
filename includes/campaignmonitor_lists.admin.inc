@@ -7,10 +7,12 @@
  */
 
 /**
- * Builds an overview table with basic information about the list and adds
- * action links that can be used to update/delete lists.
+ * Builds an overview table with basic information about the list.
  *
- * @return string $html
+ * Adds action links that can be used to update/delete lists.
+ *
+ * @return string
+ *   Rendered output.
  */
 function campaignmonitor_admin_settings_lists() {
   $account = variable_get('campaignmonitor_account', FALSE);
@@ -93,13 +95,6 @@ function campaignmonitor_admin_settings_lists() {
 
 /**
  * List edit callback that returns a form with information about a given list.
- *
- * @param array $form
- * @param array $form_state
- * @param string $list_id
- *   The unique Campaign Monitor list ID.
- *
- * @return array $form
  */
 function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id) {
 
@@ -149,7 +144,7 @@ function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id)
     '#collapsed' => FALSE,
     '#states' => array(
       'visible' => array(
-         '.enabled-list-checkbox' => array('checked' => TRUE),
+        '.enabled-list-checkbox' => array('checked' => TRUE),
       ),
     ),
   );
@@ -290,14 +285,7 @@ function campaignmonitor_admin_settings_list_edit($form, &$form_state, $list_id)
 }
 
 /**
- * Edit form validation handler which calls the API to save the information that
- * was entered. This is done in the validation function so we can give better
- * feedback to the user and to prevent the user from having to enter the
- * information once more on failure.
- *
- * @param array $form
- * @param array $form_state
- * @return boolean FALSE on failure, to prevent submission.
+ * Form validation handler for campaignmonitor_admin_settings_list_edit().
  */
 function campaignmonitor_admin_settings_list_edit_validate($form, &$form_state) {
   // Build array with basic information.
@@ -332,14 +320,6 @@ function campaignmonitor_admin_settings_list_edit_validate($form, &$form_state) 
 
 /**
  * List deletion confirmation callback.
- *
- * @param array $form
- * @param array $form_state
- * @param string $list_id
- *   The unique Campaign Monitor list ID.
- *
- * @return array
- *   The confirmation form.
  */
 function campaignmonitor_admin_settings_list_delete($form, &$form_state, $list_id) {
 
@@ -360,9 +340,6 @@ function campaignmonitor_admin_settings_list_delete($form, &$form_state, $list_i
 
 /**
  * Confirmation form delete callback.
- *
- * @param array $form
- * @param array $form_state
  */
 function campaignmonitor_admin_settings_list_delete_submit($form, &$form_state) {
   // Connect to Campaign Monitor.
@@ -385,8 +362,6 @@ function campaignmonitor_admin_settings_list_delete_submit($form, &$form_state) 
 
 /**
  * Build list creation form, which is used to create new lists.
- *
- * @return array $form
  */
 function campaignmonitor_admin_settings_list_create_form() {
   $form = array();
@@ -424,12 +399,7 @@ function campaignmonitor_admin_settings_list_create_form() {
 }
 
 /**
- * Create list validation form handler, which calls the API to create the list.
- * This is done here to ensure better user feedback on failure.
- *
- * @param array $form
- * @param array $form_state
- * @return boolean FALSE on failure
+ * Validation handler for campaignmonitor_admin_settings_list_create_form().
  */
 function campaignmonitor_admin_settings_list_create_form_validate($form, &$form_state) {
   $cm = CampaignMonitor::getConnector();
@@ -445,12 +415,11 @@ function campaignmonitor_admin_settings_list_create_form_validate($form, &$form_
 }
 
 /**
- * List creation submit handler, used to set a positive feedback message and
+ * Form submit handler for campaignmonitor_admin_settings_list_create_form().
+ *
+ * Set a positive feedback message and
  * rehash the block table, to ensure that the new list subscribe block is
  * available.
- *
- * @param array $form
- * @param array $form_state
  */
 function campaignmonitor_admin_settings_list_create_form_submit($form, &$form_state) {
   _block_rehash();
@@ -458,7 +427,9 @@ function campaignmonitor_admin_settings_list_create_form_submit($form, &$form_st
 }
 
 /**
- * Enables the list locally. The function is used as a menu callback in the list
+ * Enables the list locally.
+ *
+ * The function is used as a menu callback in the list
  * tables, when the list have been enabled the user is redirected to the list
  * page.
  *
@@ -478,7 +449,9 @@ function campaignmonitor_admin_settings_list_enable($list_id) {
 }
 
 /**
- * Disables the list locally. The function is used as a menu callback in the
+ * Disables the list locally.
+ *
+ * The function is used as a menu callback in the
  * list tables. When the list has been disabled the user is redirected to the
  * list page.
  *

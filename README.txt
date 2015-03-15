@@ -74,11 +74,3 @@ un-subscribe from one list, you are un-subscribed from all lists. The default
 for this is to un-subscribe from all. This makes it so if in the 'My Newsletters'
 area, a user un-subscribes from one list, they will be un-subscribed from all.
 I recommend turning off this feature in the Campaign Monitor administration.
-
-------------
-Future plans
-------------
-
-I hope to integrate more of the API into this module in the future.
-
-- I will gladly take any suggestions.
