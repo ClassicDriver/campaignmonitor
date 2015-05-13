@@ -67,7 +67,8 @@ function campaignmonitor_registration_form_user_register_submit($form, &$form_st
     foreach ($form_state['values']['campaignmonitor_lists'] as $list_id => $selected) {
       if ($selected) {
         // Try to subscribe to the list.
-        if (!$cm->subscribe($list_id, check_plain($form_state['values']['mail']), check_plain($form_state['values']['name']))) {
+        $cd_custom_newsletter_fields = _cd_api_get_custom_compaign_monitor_fields($cm, $list_id);
+        if (!$cm->subscribe($list_id, check_plain($form_state['values']['mail']), check_plain($form_state['values']['name']), $cd_custom_newsletter_fields)) {
           form_set_error('', t('You were not subscribed to the list. Please try again later.'));
           $form_state['redirect'] = FALSE;
           return FALSE;
