@@ -867,6 +867,7 @@ class CampaignMonitor {
         'EmailAddress' => $email,
         'Name' => $name,
         'CustomFields' => $custom_fields,
+        'ConsentToTrack' => 'yes',
         'Resubscribe' => TRUE,
       ));
       if (!$result->was_successful()) {
