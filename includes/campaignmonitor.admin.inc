@@ -30,7 +30,8 @@ function campaignmonitor_admin_settings_general() {
   );
 
   $form['campaignmonitor_account']['api_key'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
+    '#rows' => 2,
     '#title' => t('API Key'),
     '#description' => t('Your Campaign Monitor API Key. See <a href="https://www.campaignmonitor.com/api/getting-started/#authenticating_with_an_api_key">documentation</a>.'),
     '#default_value' => isset($account['api_key']) ? $account['api_key'] : '',
