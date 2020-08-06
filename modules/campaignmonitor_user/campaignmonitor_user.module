@@ -72,7 +72,7 @@ function campaignmonitor_user_form() {
 
       // Check if the user is subscribed to the current list.
       $default[$list_id] = 0;
-      if ($cm->isSubscribed($list_id, $user->mail)) {
+      if (_campaignmonitor_user_is_subscribed($list_id, $user->mail)) {
         $default[$list_id] = $list_id;
       }
     }
@@ -117,7 +117,7 @@ function campaignmonitor_user_form_submit($form, &$form_state) {
     if ($selected) {
       // If not subscribed, subscribe, else do nothing. The subscribe state is
       // already in the cache, so it cheaper to check then re-subscribe.
-      if (!$cm->isSubscribed($list_id, $user->mail)) {
+      if (!_campaignmonitor_user_is_subscribed($list_id, $user->mail)) {
         $cd_custom_newsletter_fields = _cd_api_get_custom_compaign_monitor_fields($cm, $list_id);
         if (!$cm->subscribe($list_id, $user->mail, $user->name, $cd_custom_newsletter_fields)) {
           form_set_error('', t('You were not subscribed to the list. Please try again later.'));
@@ -136,7 +136,7 @@ function campaignmonitor_user_form_submit($form, &$form_state) {
     }
     else {
       // Maybe this is an unsubscribe.
-      if ($cm->isSubscribed($list_id, $user->mail)) {
+      if (_campaignmonitor_user_is_subscribed($list_id, $user->mail)) {
         if (!$cm->unsubscribe($list_id, $user->mail)) {
           form_set_error('', t('You were not unsubscribed from the list(s). Please try again later.'));
           $form_state['redirect'] = FALSE;
@@ -210,7 +210,7 @@ function campaignmonitor_user_update(&$edit, $account, $category) {
         if (campaignmonitor_is_list_enabled($list_id) && isset($list_options['display']['user']) && $list_options['display']['user']) {
           // Check if the user is subscribed to the current list, but not yet
           // subscribed with the new e-mail.
-          if ($cm->isSubscribed($list_id, $account->original->mail) && !$cm->isSubscribed($list_id, $edit['mail'])) {
+          if (_campaignmonitor_user_is_subscribed($list_id, $account->original->mail) && !_campaignmonitor_user_is_subscribed($list_id, $edit['mail'])) {
             if ($cm->updateSubscriberEmail($list_id, $account->original->mail, $edit['mail'])) {
               drupal_set_message(t('Your e-mail adress has been updated for the "@list" list.', array('@list' => $list['name'])), 'status');
             }
@@ -222,4 +222,26 @@ function campaignmonitor_user_update(&$edit, $account, $category) {
       }
     }
   }
+}
+
+
+
+function _campaignmonitor_user_is_subscribed($list_id, $email) {
+  $cm = CampaignMonitor::getConnector();
+  $library_path = $cm->getLibraryPath();
+  require_once DRUPAL_ROOT . '/' . $library_path . '/csrest_subscribers.php';
+
+  $auth = variable_get('campaignmonitor_account', []);
+  $wrap = new CS_REST_Subscribers($list_id, $auth);
+
+  $result = $wrap->get($email, true);
+  if ($result->was_successful()) {
+    if ($result->response->State == 'Active') {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  watchdog('campaignmonitor', json_encode(['list' => $list_id, 'result' => $result]), [], WATCHDOG_DEBUG);
+  return FALSE;
 }
