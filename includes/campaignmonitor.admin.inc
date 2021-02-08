@@ -118,6 +118,7 @@ function campaignmonitor_admin_settings_general() {
  * Form validation handler. Tests if the given API keys are valid.
  */
 function campaignmonitor_admin_settings_general_validate($form, &$form_state) {
+  cache_clear_all('campaignmonitor_lists', 'cache');
   $cm = CampaignMonitor::getConnector($form_state['values']['campaignmonitor_account']['api_key'], $form_state['values']['campaignmonitor_account']['client_id']);
   $cm->getLists();
   $error = $cm->getLatestError();
