@@ -35,6 +35,8 @@ function campaignmonitor_admin_settings_general() {
     '#description' => t('Your Campaign Monitor API Key. See <a href="http://www.campaignmonitor.com/api/required/">documentation</a>.'),
     '#default_value' => isset($account['api_key']) ? $account['api_key'] : '',
     '#required' => TRUE,
+    '#size' => 170,
+    '#maxlength' => variable_get('campaignmonitor_account_api_key_max_length', 255),
   );
 
   $form['campaignmonitor_account']['client_id'] = array(
